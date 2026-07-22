@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUUC-Dispatch — Spike S1: Verified Identity</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; }
+    h1 { color: #1E3A5F; }
+    #result { margin-top: 24px; padding: 16px; border-radius: 8px; background: #f2f2f2; white-space: pre-wrap; font-family: monospace; font-size: 13px; }
+    .ok { color: #16794b; } .err { color: #b3261e; }
+  </style>
+</head>
+<body>
+  <h1>NUUC-Dispatch — Spike S1</h1>
+  <p>
+    Throwaway spike harness. Proves a static page on a genuinely different origin
+    (<code>github.io</code>) can obtain a verifiable Google identity via GIS and have the
+    NUUC-Dispatch GAS backend verify it server-side. Full contract:
+    GActionSheet's <code>docs/verified-board-portal-plan.md</code> §5.
+  </p>
+
+  <div id="g_id_onload"
+       data-client_id="GIS_CLIENT_ID_PLACEHOLDER"
+       data-callback="onSignIn">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <pre id="result">(sign in above to run the doGet + doPost verification calls)</pre>
+
+  <script>
+    // TODO: replace with the real NUUC-Dispatch /exec URL once SETUP.md is complete.
+    const WEBAPP_URL = 'WEBAPP_EXEC_URL_PLACEHOLDER';
+
+    function onSignIn(credentialResponse) {
+      const idToken = credentialResponse.credential;
+      const out = document.getElementById('result');
+      out.textContent = 'Got ID token. Calling doGet and doPost...\n';
+
+      // doGet — exercises A1/A7 via a simple cross-origin GET.
+      fetch(WEBAPP_URL + '?cmd=spike_verify_identity&idToken=' + encodeURIComponent(idToken))
+        .then(r => r.json())
+        .then(json => {
+          out.textContent += '\ndoGet result:\n' + JSON.stringify(json, null, 2);
+        })
+        .catch(err => { out.textContent += '\ndoGet FAILED: ' + err; });
+
+      // doPost — text/plain body keeps this a CORS-simple request (A7).
+      fetch(WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'spike_verify_identity', idToken })
+      })
+        .then(r => r.json())
+        .then(json => {
+          out.textContent += '\n\ndoPost result:\n' + JSON.stringify(json, null, 2);
+        })
+        .catch(err => { out.textContent += '\n\ndoPost FAILED: ' + err; });
+    }
+  </script>
+
+  <p style="margin-top:40px; font-size: 13px; color: #666;">
+    <a href="privacy/">Privacy Policy</a> ·
+    <a href="terms/">Terms of Service</a>
+  </p>
+</body>
+</html>
