@@ -17,6 +17,6 @@ full spike design.
 - `consent-screen-text.md` — the exact text/links to paste into the GCP OAuth consent
   screen form.
 
-Not yet live — GitHub Pages configuration for this repo (`sdonaldson-nl/NUUC-Static`)
+Not yet live — GitHub Pages configuration for this repo (`nuuc-it/Static`)
 hasn't been confirmed enabled; check via repo Settings → Pages, or
-`gh api repos/sdonaldson-nl/NUUC-Static/pages`.
+`gh api repos/nuuc-it/Static/pages`.

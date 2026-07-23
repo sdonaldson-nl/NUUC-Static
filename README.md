@@ -1,1 +1,1 @@
-# NUUC-Static
+# Static
